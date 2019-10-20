@@ -60,6 +60,14 @@ QT_USE_NAMESPACE
 
 static const char blankString[] = QT_TRANSLATE_NOOP("SettingsDialog", "N/A");
 
+QString SettingsDialog::portKey = "PORT";
+QString SettingsDialog::baudKey = "BAUD";
+QString SettingsDialog::dataBitKey = "DATA_BIT";
+QString SettingsDialog::parityKey = "PARITY";
+QString SettingsDialog::stopBitKey = "STOP_BIT";
+QString SettingsDialog::flowKey = "FLOW";
+QString SettingsDialog::autoconnectKey = "AUTOCONNECT";
+
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SettingsDialog)
@@ -69,6 +77,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     intValidator = new QIntValidator(0, 4000000, this);
 
     ui->baudRateBox->setInsertPolicy(QComboBox::NoInsert);
+
+    m_settings = new QSettings("settings.ini", QSettings::IniFormat, this);
 
     connect(ui->applyButton, &QPushButton::clicked,
             this, &SettingsDialog::apply);
@@ -160,8 +170,6 @@ void SettingsDialog::fillPortsParameters()
     ui->baudRateBox->addItem(QStringLiteral("4M"), 4000000);
     ui->baudRateBox->addItem(QStringLiteral("5M"), 5000000);
 
-
-
     ui->baudRateBox->addItem(tr("Custom"));
 
     ui->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
@@ -186,10 +194,12 @@ void SettingsDialog::fillPortsParameters()
     ui->flowControlBox->addItem(tr("RTS/CTS"), QSerialPort::HardwareControl);
     ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
 
-
-
-    ui->baudRateBox->setCurrentIndex(3);
-    ui->stopBitsBox->setCurrentIndex(0);
+    ui->baudRateBox->setCurrentIndex(m_settings->value(baudKey, 0).toInt());
+    ui->dataBitsBox->setCurrentIndex(m_settings->value(dataBitKey, 0).toInt());
+    ui->parityBox->setCurrentIndex(m_settings->value(parityKey, 0).toInt());
+    ui->stopBitsBox->setCurrentIndex(m_settings->value(stopBitKey, 0).toInt());
+    ui->flowControlBox->setCurrentIndex(m_settings->value(flowKey, 0).toInt());
+    ui->checkBoxAutoConnect->setChecked(m_settings->value(autoconnectKey, false).toBool());
 }
 
 void SettingsDialog::fillPortsInfo()
@@ -222,7 +232,7 @@ void SettingsDialog::updateSettings()
 {
     currentSettings.name = ui->serialPortInfoListBox->currentText();
 
-    if (ui->baudRateBox->currentIndex() == 4) {
+    if (ui->baudRateBox->currentIndex() == ui->baudRateBox->count()-1) {
         currentSettings.baudRate = ui->baudRateBox->currentText().toInt();
     } else {
         currentSettings.baudRate = static_cast<QSerialPort::BaudRate>(
@@ -247,4 +257,12 @@ void SettingsDialog::updateSettings()
     currentSettings.stringFlowControl = ui->flowControlBox->currentText();
 
     currentSettings.localEchoEnabled = ui->localEchoCheckBox->isChecked();
+    currentSettings.autoConnectEnabled = ui->checkBoxAutoConnect->isChecked();
+
+    m_settings->setValue(baudKey, ui->baudRateBox->currentIndex());
+    m_settings->setValue(dataBitKey, ui->dataBitsBox->currentIndex());
+    m_settings->setValue(parityKey, ui->parityBox->currentIndex());
+    m_settings->setValue(stopBitKey, ui->stopBitsBox->currentIndex());
+    m_settings->setValue(flowKey, ui->flowControlBox->currentIndex());
+    m_settings->setValue(autoconnectKey, ui->checkBoxAutoConnect->isChecked());
 }

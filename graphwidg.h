@@ -31,6 +31,9 @@ private:
     size_t allGraphCount;
     uint64_t internalCounter;
 
+    QTextEdit *textEdit;
+    QPushButton *saveDataButton;
+    QPushButton *closeButton;
 
     void closeEvent(QCloseEvent *e);
 
@@ -38,12 +41,15 @@ public slots:
     void setData(QVector<double> xData, QVector<double> yData, int graphIndex);
     void appendData(double xN, double yN, int graphIndex);
     void appendYPoint(double yN, int graphIndex);
+    void clear();
 
 private slots:
     void setGraphArea(double val);
     void showSetting(bool sh);
     void stopBtnPressed();
     void getData();
+    void closeData();
+    void saveData();
     void replotTimerTick();
 
 
@@ -64,6 +70,11 @@ public:
         this->worker = new GraphWidgWorker(parent, graphCount, name);
         moveToThread(workerThread);
         workerThread->start();
+    }
+
+    void clear()
+    {
+        this->worker->clear();
     }
 
     void setData(QVector<double> xData, QVector<double> yData, int graphIndex)

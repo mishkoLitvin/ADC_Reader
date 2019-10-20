@@ -74,7 +74,16 @@
      </item>
      <item>
       <widget class="QWidget" name="widgetPlotter" native="true">
-       <layout class="QGridLayout" name="gridLayout_2">
+       <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0">
+        <item row="0" column="1">
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <layout class="QVBoxLayout" name="layoutData"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="layoutPlotter"/>
         </item>

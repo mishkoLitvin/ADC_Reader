@@ -55,6 +55,8 @@
 #include <QDialog>
 #include <QtSerialPort/QSerialPort>
 
+#include <QSettings>
+
 QT_USE_NAMESPACE
 
 QT_BEGIN_NAMESPACE
@@ -85,13 +87,21 @@ public:
         QSerialPort::FlowControl flowControl;
         QString stringFlowControl;
         bool localEchoEnabled;
+        bool autoConnectEnabled;
     };
 
-    explicit SettingsDialog(QWidget *parent = 0);
+    explicit SettingsDialog(QWidget *parent = nullptr);
     ~SettingsDialog();
 
     Settings settings() const;
 
+    static QString portKey;
+    static QString baudKey;
+    static QString dataBitKey;
+    static QString parityKey;
+    static QString stopBitKey;
+    static QString flowKey;
+    static QString autoconnectKey;
 
 private slots:
     void showPortInfo(int idx);
@@ -110,6 +120,7 @@ private:
     Ui::SettingsDialog *ui;
     Settings currentSettings;
     QIntValidator *intValidator;
+    QSettings *m_settings;
 };
 
 #endif // SETTINGSDIALOG_H

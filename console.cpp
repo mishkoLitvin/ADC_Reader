@@ -59,7 +59,6 @@ Console::Console(QWidget *parent)
     : QPlainTextEdit(parent)
     , localEchoEnabled(false)
 {
-//    document()->setMaximumBlockCount(1000);
     QPalette p = palette();
     p.setColor(QPalette::Base, Qt::black);
     p.setColor(QPalette::Text, Qt::green);

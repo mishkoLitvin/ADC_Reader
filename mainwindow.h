@@ -100,6 +100,11 @@ private slots:
 
     void clearData();
 
+    void setRecord(bool record);
+    void saveToFile();
+
+    void powerOff();
+
 private:
     void initActionsConnections();
 
@@ -109,11 +114,8 @@ private:
     Ui::MainWindow *ui;
     QLabel *status;
     Console *console;
-    SettingsDialog *settings;
+    SettingsDialog *settingsDialog;
     QSerialPort *serial;
-
-    QFile outFile;
-    QTextStream outStream;
 
     GraphWidg *graphicItem;
 
@@ -122,6 +124,8 @@ private:
 
     int dataLen;
 
+    bool recordData = true;
+    QVector<QPointF> allData;
 
     unsigned short startFrameData[9];
 };

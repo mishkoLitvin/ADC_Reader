@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <QDebug>
+#include <QFile>
+#include <QFileDialog>
 
 GraphWidgWorker::GraphWidgWorker(QWidget *parent, int graphCount, QString name) :
     QWidget(parent),
@@ -12,6 +14,20 @@ GraphWidgWorker::GraphWidgWorker(QWidget *parent, int graphCount, QString name) 
 
     plot = new QCustomPlot(this);
     ui->layoutPlotter->addWidget(plot);
+
+    textEdit = new QTextEdit(this);
+    ui->layoutData->addWidget(textEdit);
+    ui->widget->setVisible(false);
+
+    saveDataButton = new QPushButton(this);
+    saveDataButton->setText("Save data");
+    ui->layoutData->addWidget(saveDataButton);
+
+    closeButton = new QPushButton(this);
+    closeButton->setText("Close");
+    ui->layoutData->addWidget(closeButton);
+
+    connect(closeButton, &QPushButton::clicked, this, &GraphWidgWorker::closeData);
 
     this->setWindowTitle(name);
 
@@ -88,10 +104,8 @@ void GraphWidgWorker::stopBtnPressed()
 
 void GraphWidgWorker::getData()
 {
-    QTextEdit *tEditData = new QTextEdit(nullptr);
-
     size_t i, j;
-    tEditData->clear();
+    textEdit->clear();
     QString tempStr;
     for(i = 0; i<x->size(); i++)
     {
@@ -100,10 +114,27 @@ void GraphWidgWorker::getData()
         {
             tempStr += QString::number(x[j][i])+"\t"+QString::number(y[j][i]);
         }
-        tEditData->append(tempStr);
+        textEdit->append(tempStr);
     }
 
-    tEditData->show();
+    ui->widget->setVisible(true);
+}
+
+void GraphWidgWorker::closeData()
+{
+    ui->widget->setVisible(false);
+}
+
+void GraphWidgWorker::saveData()
+{
+    QString fName = QFileDialog::getSaveFileName(this, "Save data", QDir::homePath());
+    QFile file(fName);
+    file.open(QIODevice::WriteOnly);
+    file.write(textEdit->toPlainText().toLocal8Bit());
+    file.flush();
+    file.close();
+    ui->widget->setVisible(false);
+
 }
 
 void GraphWidgWorker::replotTimerTick()
@@ -205,5 +236,14 @@ void GraphWidgWorker::appendData(double xN, double yN, int graphIndex)
 void GraphWidgWorker::appendYPoint(double yN, int graphIndex)
 {
     this->appendData(internalCounter++, yN, graphIndex);
+}
+
+void GraphWidgWorker::clear()
+{
+    for (size_t i(0); i<allGraphCount; i++) {
+        x[i].clear();
+        y[i].clear();
+        plot->graph(i)->setData(x[i], y[i]);
+    }
 }
 
