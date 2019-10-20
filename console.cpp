@@ -59,10 +59,6 @@ Console::Console(QWidget *parent)
     : QPlainTextEdit(parent)
     , localEchoEnabled(false)
 {
-    QPalette p = palette();
-    p.setColor(QPalette::Base, Qt::black);
-    p.setColor(QPalette::Text, Qt::green);
-    setPalette(p);
 //    connect(this, SIGNAL(textChanged()), this, SLOT(on_textChanged()));
 }
 

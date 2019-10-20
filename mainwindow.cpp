@@ -29,6 +29,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowTitle("ADC Reader");
 
+    qApp->setStyleSheet("*{color: black; "
+                        "background-color: #DDD; "
+                        "selection-color: #FFF;"
+                        "selection-background-color: #666};"
+                        "QComboBox{background-color: #DDD; spacing: 5px;};"
+                        "QCheckBox::indicator{ min-width: 30px; min-height: 30px;}; "
+                        "QComboBox::drop-down { subcontrol-origin: padding; "
+                        "subcontrol-position: top right; "
+                        "width: 15px; "
+                        "border-left-width: 1px; "
+                        "border-left-color: darkgray; "
+                        "border-left-style: solid; "
+                        "border-top-right-radius: 3px; "
+                        "border-bottom-right-radius: 3px;};"
+                        );
+    console->setStyleSheet("*{color: #1F1;"
+                           "background-color: #111; "
+                           "selection-color: #111; "
+                           "selection-background-color: #1F1};");
+    settingsDialog->setStyleSheet(qApp->styleSheet());
+
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionQuit->setEnabled(true);
