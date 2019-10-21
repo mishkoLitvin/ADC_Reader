@@ -50,6 +50,14 @@ MainWindow::MainWindow(QWidget *parent) :
                            "selection-background-color: #1F1};");
     settingsDialog->setStyleSheet(qApp->styleSheet());
 
+    alertLabel = new QLabel(this);
+    ui->consoleLayout->addWidget(alertLabel);
+    alertLabel->setText("BEWARE! \nVOLTAGE IS TOO HIGH!!");
+    alertLabel->setFont(QFont("Times", 25, 1, true));
+
+    alertLabel->setAlignment(Qt::AlignHCenter);
+    alertLabel->setVisible(false);
+
     ui->actionConnect->setEnabled(true);
     ui->actionDisconnect->setEnabled(false);
     ui->actionQuit->setEnabled(true);
@@ -172,7 +180,7 @@ void MainWindow::readData()
     static int ggg = 0;
     serialData.append(serial->readAll());
     QByteArray tempData;
-    if(serialData.length()>4)
+    if(serialData.length()>2)
     {
         QString text = QString::number(ggg++)+"\t";
 
@@ -183,8 +191,10 @@ void MainWindow::readData()
         if(data>0x400000)
             data = data-0x7FFFFF;
 
-        double k = static_cast<double>(0x3FFFFF)*2/2.5;
-        double voltage = static_cast<double>(data)/k;
+        double k = static_cast<double>(0x3FFFFF)*2./2.5;
+        double voltage = static_cast<double>(data)/k*1000.;
+
+        alertLabel->setVisible(fabs(voltage)>1200);
         text += QString::number(data)+"\t"+QString::number(voltage, 'f', 9)+"\t";
         if(recordData)
         {
@@ -193,6 +203,7 @@ void MainWindow::readData()
         console->putData(text+"\n");
         graphicItem->appendData(ggg/10.0, data, 0);
         ui->progressBar->setValue(ggg%100);
+        serialData.clear();
     }
 }
 

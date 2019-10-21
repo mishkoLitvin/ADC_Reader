@@ -116,6 +116,7 @@ private:
     Console *console;
     SettingsDialog *settingsDialog;
     QSerialPort *serial;
+    QLabel *alertLabel;
 
     GraphWidg *graphicItem;
 
