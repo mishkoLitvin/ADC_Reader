@@ -47,11 +47,13 @@ I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 
+TIM_HandleTypeDef htim1;
+
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+uint8_t watchDogCnt = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,6 +62,7 @@ static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
@@ -67,6 +70,22 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void resetADC()
+{
+	HAL_GPIO_WritePin(Power_GPIO_Port, Power_Pin, RESET);
+
+	int i;
+
+	for(i = 0; i<20; i++)
+	{
+		HAL_Delay(10);
+		HAL_GPIO_TogglePin(LD_GPIO_Port, LD_Pin);
+	}
+	HAL_GPIO_WritePin(Power_GPIO_Port, Power_Pin, SET);
+	HAL_Delay(100);
+	HAL_GPIO_TogglePin(LD_GPIO_Port, LD_Pin);
+}
 
 /* USER CODE END 0 */
 
@@ -103,7 +122,18 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C1_Init();
   MX_USB_DEVICE_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+  uint32_t i;
+
+  for(i = 0; i<15; i++)
+    {
+  	  HAL_Delay(10);
+  	  HAL_GPIO_TogglePin(LD_GPIO_Port, LD_Pin);
+  	  HAL_Delay(90);
+  	  HAL_GPIO_TogglePin(LD_GPIO_Port, LD_Pin);
+    }
+
   HAL_GPIO_WritePin(Gain0_GPIO_Port, Gain0_Pin, SET);
   HAL_GPIO_WritePin(Gain1_GPIO_Port, Gain1_Pin, RESET);
 
@@ -115,7 +145,6 @@ int main(void)
 
   HAL_Delay(1000);
   HAL_GPIO_WritePin(LD_GPIO_Port, LD_Pin, RESET);
-  int i;
   HAL_GPIO_WritePin(Power_GPIO_Port, Power_Pin, RESET);
 
 
@@ -127,37 +156,49 @@ int main(void)
   HAL_GPIO_WritePin(Power_GPIO_Port, Power_Pin, SET);
 
   uint8_t spiData[3];
+  uint8_t spiDataBad[3];
   uint8_t spiDataFantom[3];
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_TIM_Base_Start_IT(&htim1);
+
   uint8_t enterEn = 1;
+
+  uint8_t prescaler = 0;
 
   while (1)
   {
 	  if(HAL_GPIO_ReadPin(DataReady_GPIO_Port, DataReady_Pin))
 	  {
 		  enterEn = 1;
-		  while(HAL_GPIO_ReadPin(DataReady_GPIO_Port, DataReady_Pin))
-		  {
 
+		  while(HAL_GPIO_ReadPin(DataReady_GPIO_Port, DataReady_Pin)){
+			  if(watchDogCnt>10)
+				  resetADC();
 		  }
+
 		  if(!HAL_GPIO_ReadPin(DataReady_GPIO_Port, DataReady_Pin) && enterEn)
 		  {
-			  HAL_GPIO_TogglePin(LD_GPIO_Port, LD_Pin);
 			  int16_t T = 10000;
 			  while(T--);
+
+			  HAL_GPIO_TogglePin(LD_GPIO_Port, LD_Pin);
+
 			  HAL_SPI_TransmitReceive(&hspi1, spiDataFantom, spiData, 3, 10);
 
 			  HAL_UART_Transmit(&huart1, spiData, 3, 1);
 			  HAL_Delay(10);
 			  enterEn = 0;
+			  prescaler = 0;
+			  watchDogCnt = 0;
+
 		  }
 	  }
-
-	  i++;
+	  if(watchDogCnt>10)
+		  resetADC();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -267,7 +308,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -279,6 +320,52 @@ static void MX_SPI1_Init(void)
   /* USER CODE BEGIN SPI1_Init 2 */
 
   /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM1_Init(void)
+{
+
+  /* USER CODE BEGIN TIM1_Init 0 */
+
+  /* USER CODE END TIM1_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 7200;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 1000;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
 
 }
 
