@@ -89,7 +89,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void openSerialPortName(QString portName);
     void openSerialPort();
     void closeSerialPort();
     void about();
@@ -104,6 +103,7 @@ private slots:
     void saveToFile();
 
     void powerOff();
+    void exitFromApp();
 
 private:
     void initActionsConnections();
@@ -111,12 +111,23 @@ private:
 private:
     void showStatusMessage(const QString &message);
 
+    void resetLog();
+
+    QString c_dataFileName = "data.dat";
+
     Ui::MainWindow *ui;
     QLabel *status;
     Console *console;
     SettingsDialog *settingsDialog;
     QSerialPort *serial;
     QLabel *alertLabel;
+    QLabel *valueLabel;
+
+    QFile m_logFile;
+    QTextStream m_out;
+
+    QFile m_dataFile;
+    QTextStream m_dataOut;
 
     GraphWidg *graphicItem;
 
@@ -126,7 +137,6 @@ private:
     int dataLen;
 
     bool recordData = true;
-    QVector<QPointF> allData;
 
     unsigned short startFrameData[9];
 };

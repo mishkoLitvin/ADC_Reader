@@ -3,6 +3,7 @@ import qbs.FileInfo
 Product {
     type: "application"
     name: "ADC_Reader"
+    Depends { name: "Qt.core" }
     Depends { name: "Qt.gui" }
     Depends { name: "Qt.widgets" }
     Depends { name: "Qt.serialport" }
