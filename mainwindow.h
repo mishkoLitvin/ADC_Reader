@@ -131,7 +131,7 @@ private:
 
     GraphWidg *graphicItem;
 
-    int dataCnt;
+    int m_mainDataCounter;
     QByteArray serialData;
 
     int dataLen;
