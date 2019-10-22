@@ -163,11 +163,10 @@ void MainWindow::writeData(const QByteArray &data)
 //! [7]
 void MainWindow::readData()
 {
-    static int ggg = 0;
     serialData.append(serial->readAll());
     if(serialData.length()>2)
     {
-        QString text = QString::number(ggg++)+"\t";
+        QString text = QString::number(m_mainDataCounter++)+"\t";
 
         int data =
                 static_cast<int>(((static_cast<uint8_t>(serialData[0]))<<16) & 0x00FF0000)
@@ -180,7 +179,7 @@ void MainWindow::readData()
         double voltage = static_cast<double>(data)/k*1000.;
 
         alertLabel->setVisible(fabs(voltage)>1200);
-        if(ggg%10 == 0)
+        if(m_mainDataCounter%10 == 0)
             valueLabel->setNum(voltage);
 
         text += QString::number(data)+"\t"+QString::number(voltage, 'f', 9)+"\t";
@@ -191,13 +190,13 @@ void MainWindow::readData()
 
         if(recordData && m_dataFile.isOpen())
         {
-           m_dataOut<<ggg/10.0<<"\t"<<data<<"\n";
+           m_dataOut<<m_mainDataCounter/10.0<<"\t"<<data<<"\n";
            m_dataOut.flush();
         }
 
         console->putData(text+"\n");
-        graphicItem->appendData(ggg/10.0, data, 0);
-        ui->progressBar->setValue(ggg%100);
+        graphicItem->appendData(m_mainDataCounter/10.0, data, 0);
+        ui->progressBar->setValue(m_mainDataCounter%100);
         serialData.clear();
     }
 }
@@ -224,6 +223,7 @@ void MainWindow::clearData()
     qDebug()<<"m_dataFile.open"<<m_dataFile.open(QIODevice::ReadWrite);
     m_dataOut.setDevice(&m_dataFile);
     resetLog();
+    m_mainDataCounter = 0;
 }
 
 void MainWindow::setRecord(bool record)
