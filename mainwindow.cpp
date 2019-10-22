@@ -303,9 +303,9 @@ void MainWindow::powerOff()
                             "Do You want to save data to file?");
                 msg.addButton(QMessageBox::Yes);
                 msg.addButton(QMessageBox::No);
-                msg.exec();
+                int res2 = msg.exec();
 
-                if(res == QMessageBox::Yes){
+                if(res2 == QMessageBox::Yes){
                     this->saveToFile();
                     return;
                 }
