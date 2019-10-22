@@ -303,8 +303,11 @@ void MainWindow::powerOff()
                             "Do You want to save data to file?");
                 msg.addButton(QMessageBox::Yes);
                 msg.addButton(QMessageBox::No);
+                msg.exec();
+
                 if(res == QMessageBox::Yes){
                     this->saveToFile();
+                    return;
                 }
             }
 
@@ -314,7 +317,7 @@ void MainWindow::powerOff()
                 QFile::remove(c_dataFileName);
 
             closeSerialPort();
-            //system("poweroff");
+            system("poweroff");
         }
     }
 
