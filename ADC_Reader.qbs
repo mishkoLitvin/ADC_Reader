@@ -1,6 +1,9 @@
 import qbs.FileInfo
 
-QtApplication {
+Product {
+    type: "application"
+    name: "ADC_Reader"
+    Depends { name: "Qt.gui" }
     Depends { name: "Qt.widgets" }
     Depends { name: "Qt.serialport" }
     Depends { name: "Qt.printsupport" }
