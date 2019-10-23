@@ -295,7 +295,10 @@ void MainWindow::powerOff()
             if(m_logFile.isOpen()){
                 m_logFile.flush();
                 m_logFile.close();
+                QString cmd = "rm -rf "+c_logDirectory;
+                system(cmd.toStdString().data());
             }
+
 
             if(recordData && m_dataFile.isOpen()){
                 QMessageBox msg;
@@ -310,6 +313,8 @@ void MainWindow::powerOff()
                     return;
                 }
             }
+
+
 
             if(m_dataFile.isOpen())
                 m_dataFile.close();
@@ -345,11 +350,6 @@ void MainWindow::exitFromApp()
         }
         else {
             if(res == QMessageBox::Yes){
-                if(m_logFile.isOpen()){
-                    m_logFile.flush();
-                    m_logFile.close();
-                }
-
                 if(recordData && m_dataFile.isOpen()){
                     QMessageBox msg;
                     msg.setText("<Record> was enabled!\n"
@@ -365,6 +365,15 @@ void MainWindow::exitFromApp()
                     m_dataFile.close();
                 if(QFile::exists(c_dataFileName))
                     QFile::remove(c_dataFileName);
+
+                if(m_logFile.isOpen()){
+                    m_logFile.flush();
+                    m_logFile.close();
+                    QString cmd = "rm -rf "+c_logDirectory;
+                    system(cmd.toStdString().data());
+                }
+
+
 
                 closeSerialPort();
                 close();
@@ -405,12 +414,12 @@ void MainWindow::resetLog()
     }
 
     QDir dir;
-    dir.setPath("/home/user/Log/");
+    dir.setPath(c_logDirectory);
     qDebug()<<"log dir.exists"<<dir.exists();
     if(!dir.exists())
-        qDebug()<<dir.mkdir("/home/user/Log/");
+        qDebug()<<dir.mkdir(c_logDirectory);
 
-    m_logFile.setFileName("/home/user/Log/"+QDateTime::currentDateTime().toString("yyMMdd_HHmmss"));
+    m_logFile.setFileName(c_logDirectory+QDateTime::currentDateTime().toString("yyMMdd_HHmmss"));
     m_logFile.open(QIODevice::ReadWrite);
     m_out.setDevice(&m_logFile);
 }

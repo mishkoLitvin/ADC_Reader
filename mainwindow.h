@@ -114,6 +114,7 @@ private:
     void resetLog();
 
     QString c_dataFileName = "data.dat";
+    QString c_logDirectory = "/home/user/Log/";
 
     Ui::MainWindow *ui;
     QLabel *status;
@@ -125,6 +126,7 @@ private:
 
     QFile m_logFile;
     QTextStream m_out;
+
 
     QFile m_dataFile;
     QTextStream m_dataOut;
