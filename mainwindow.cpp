@@ -90,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicLayout->addWidget(graphicItem->worker);
 
     this->clearData();
+    m_dataSpace = 1;
 
     if(settingsDialog->settings().autoConnectEnabled){
         this->openSerialPort();
@@ -193,12 +194,18 @@ void MainWindow::readData()
            m_dataOut<<m_mainDataCounter/10.0<<"\t"<<data<<"\n";
            m_dataOut.flush();
         }
-
-        console->putData(text+"\n");
-        graphicItem->appendData(m_mainDataCounter/10.0, data, 0);
+        if(m_mainDataCounter%m_dataSpace == 0){
+            console->putData(text+"\n");
+            graphicItem->appendData(m_mainDataCounter/10.0, data, 0);
+        }
         ui->progressBar->setValue(m_mainDataCounter%100);
         serialData.clear();
     }
+}
+
+void MainWindow::setDataSpacing(int value)
+{
+    m_dataSpace = value;
 }
 
 void MainWindow::handleError(QSerialPort::SerialPortError error)

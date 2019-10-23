@@ -95,6 +95,8 @@ private slots:
     void writeData(const QByteArray &serialData);
     void readData();
 
+    void setDataSpacing(int value);
+
     void handleError(QSerialPort::SerialPortError error);
 
     void clearData();
@@ -137,6 +139,7 @@ private:
     QByteArray serialData;
 
     int dataLen;
+    int m_dataSpace;
 
     bool recordData = true;
 
