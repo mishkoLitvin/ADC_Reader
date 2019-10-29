@@ -165,14 +165,20 @@ void MainWindow::writeData(const QByteArray &data)
 void MainWindow::readData()
 {
     serialData.append(serial->readAll());
-    if(serialData.length()>2)
+    if(serialData.length()>7)
     {
         QString text = QString::number(m_mainDataCounter++)+"\t";
 
-        int data =
-                static_cast<int>(((static_cast<uint8_t>(serialData[0]))<<16) & 0x00FF0000)
+        m_mainDataCounter =
+                static_cast<int>(((static_cast<uint8_t>(serialData[3]))<<16) & 0x00FF0000)
+                | static_cast<int>(((static_cast<uint8_t>(serialData[2]))<<16) & 0x00FF0000)
                 | static_cast<int>(((static_cast<uint8_t>(serialData[1]))<<8) & 0x0000FF00)
-                | static_cast<int>(((static_cast<uint8_t>(serialData[2]))<<0 ) & 0x000000FF);
+                | static_cast<int>(((static_cast<uint8_t>(serialData[0]))<<0 ) & 0x000000FF);
+
+        int data =
+                static_cast<int>(((static_cast<uint8_t>(serialData[5]))<<16) & 0x00FF0000)
+                | static_cast<int>(((static_cast<uint8_t>(serialData[6]))<<8) & 0x0000FF00)
+                | static_cast<int>(((static_cast<uint8_t>(serialData[7]))<<0 ) & 0x000000FF);
         if(data>0x400000)
             data = data-0x7FFFFF;
 
