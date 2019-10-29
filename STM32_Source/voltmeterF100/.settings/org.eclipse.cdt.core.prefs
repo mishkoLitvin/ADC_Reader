@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.352718/PATH/delimiter=\:
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.352718/PATH/operation=replace
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.352718/PATH/value=/home/mishko/Packages/STM32AC6/plugins/fr.ac6.mcu.externaltools.arm-none.linux64_1.17.0.201812190825/tools/compiler/bin\:/home/mishko/bin\:/usr/local/bin\:/usr/bin\:/bin
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.352718/append=true
+environment/project/fr.ac6.managedbuild.config.gnu.cross.exe.debug.352718/appendContributed=true

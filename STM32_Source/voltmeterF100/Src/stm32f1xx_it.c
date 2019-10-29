@@ -43,6 +43,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 extern uint8_t watchDogCnt;
+extern uint32_t sendIndex;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -223,6 +225,7 @@ void TIM1_UP_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_IRQn 1 */
   watchDogCnt++;
+  sendIndex++;
   /* USER CODE END TIM1_UP_IRQn 1 */
 }
 

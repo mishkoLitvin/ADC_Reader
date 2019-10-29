@@ -54,6 +54,7 @@ UART_HandleTypeDef huart1;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 uint8_t watchDogCnt = 0;
+uint32_t sendIndex;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -158,6 +159,9 @@ int main(void)
   uint8_t spiData[3];
   uint8_t spiDataBad[3];
   uint8_t spiDataFantom[3];
+
+  uint8_t uartData[8];
+
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
@@ -168,6 +172,8 @@ int main(void)
   uint8_t enterEn = 1;
 
   uint8_t prescaler = 0;
+
+  sendIndex = 0;
 
   while (1)
   {
@@ -189,7 +195,18 @@ int main(void)
 
 			  HAL_SPI_TransmitReceive(&hspi1, spiDataFantom, spiData, 3, 10);
 
-			  HAL_UART_Transmit(&huart1, spiData, 3, 1);
+			  uartData[0] = sendIndex&0x000000FF;
+			  uartData[1] = (sendIndex>>8) & 0x000000FF;
+			  uartData[2] = (sendIndex>>16) & 0x000000FF;
+			  uartData[3] = (sendIndex>>24) & 0x000000FF;
+
+			  uartData[4] = 0xAA;
+
+			  uartData[5] = spiData[0];
+			  uartData[6] = spiData[1];
+			  uartData[7] = spiData[2];
+
+			  HAL_UART_Transmit(&huart1, uartData, 8, 1);
 			  HAL_Delay(10);
 			  enterEn = 0;
 			  prescaler = 0;
