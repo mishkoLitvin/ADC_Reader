@@ -170,7 +170,7 @@ void MainWindow::readData()
         QString text = QString::number(m_mainDataCounter++)+"\t";
 
         m_mainDataCounter =
-                static_cast<int>(((static_cast<uint8_t>(serialData[3]))<<16) & 0x00FF0000)
+                static_cast<int>(((static_cast<uint8_t>(serialData[3]))<<24) & 0xFF000000)
                 | static_cast<int>(((static_cast<uint8_t>(serialData[2]))<<16) & 0x00FF0000)
                 | static_cast<int>(((static_cast<uint8_t>(serialData[1]))<<8) & 0x0000FF00)
                 | static_cast<int>(((static_cast<uint8_t>(serialData[0]))<<0 ) & 0x000000FF);
