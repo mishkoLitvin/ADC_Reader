@@ -164,11 +164,12 @@ void MainWindow::writeData(const QByteArray &data)
 //! [7]
 void MainWindow::readData()
 {
+    static int s_dataSpacer = 0;
+
     serialData.append(serial->readAll());
     if(serialData.length()>7)
     {
-        QString text = QString::number(m_mainDataCounter++)+"\t";
-
+        s_dataSpacer++;
         m_mainDataCounter =
                 static_cast<int>(((static_cast<uint8_t>(serialData[3]))<<24) & 0xFF000000)
                 | static_cast<int>(((static_cast<uint8_t>(serialData[2]))<<16) & 0x00FF0000)
@@ -182,11 +183,14 @@ void MainWindow::readData()
         if(data>0x400000)
             data = data-0x7FFFFF;
 
+        QString text = QString::number(m_mainDataCounter)+"\t";
+
+
         double k = static_cast<double>(0x3FFFFF)*2./2.5;
         double voltage = static_cast<double>(data)/k*1000.;
 
         alertLabel->setVisible(fabs(voltage)>1200);
-        if(m_mainDataCounter%10 == 0)
+        if(s_dataSpacer%10 == 0)
             valueLabel->setNum(voltage);
 
         text += QString::number(data)+"\t"+QString::number(voltage, 'f', 9)+"\t";
@@ -197,15 +201,16 @@ void MainWindow::readData()
 
         if(recordData && m_dataFile.isOpen())
         {
-           m_dataOut<<m_mainDataCounter/10.0<<"\t"<<data<<"\n";
+           m_dataOut<<m_mainDataCounter/100.0<<"\t"<<data<<"\n";
            m_dataOut.flush();
         }
-        if(m_mainDataCounter%m_dataSpace == 0){
+        if(s_dataSpacer%m_dataSpace == 0){
             console->putData(text+"\n");
-            graphicItem->appendData(m_mainDataCounter/10.0, data, 0);
+            graphicItem->appendData(m_mainDataCounter/100.0, data, 0);
         }
-        ui->progressBar->setValue(m_mainDataCounter%100);
+        ui->progressBar->setValue(s_dataSpacer%100);
         serialData.clear();
+
     }
 }
 
@@ -411,6 +416,8 @@ void MainWindow::initActionsConnections()
 
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveToFile);
     connect(ui->actionRecord, &QAction::triggered, this, &MainWindow::setRecord);
+
+    connect(ui->spinBoxDataSpace, SIGNAL(valueChanged(int)), this, SLOT(setDataSpacing(int)));
 
 }
 

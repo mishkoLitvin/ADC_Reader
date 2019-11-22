@@ -136,10 +136,10 @@ private:
     GraphWidg *graphicItem;
 
     int m_mainDataCounter;
+    int m_dataSpace;
     QByteArray serialData;
 
     int dataLen;
-    int m_dataSpace;
 
     bool recordData = true;
 

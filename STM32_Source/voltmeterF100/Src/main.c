@@ -182,7 +182,7 @@ int main(void)
 		  enterEn = 1;
 
 		  while(HAL_GPIO_ReadPin(DataReady_GPIO_Port, DataReady_Pin)){
-			  if(watchDogCnt>10)
+			  if(watchDogCnt>100)
 				  resetADC();
 		  }
 
@@ -359,7 +359,7 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 7200;
+  htim1.Init.Prescaler = 720;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 1000;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

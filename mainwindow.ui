@@ -263,6 +263,9 @@
    </property>
   </action>
   <action name="actionTurn_Off">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="terminal.qrc">
      <normaloff>:/images/poweroff.png</normaloff>:/images/poweroff.png</iconset>
